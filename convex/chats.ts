@@ -58,3 +58,19 @@ export const list = query({
       .collect();
   },
 });
+
+//Rename
+export const rename = mutation({
+  args: { id: v.id("chats"), title: v.string() },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.id, { title: args.title });
+  },
+});
+
+//Remove
+export const remove = mutation({
+  args: { id: v.id("chats") },
+  handler: async (ctx, args) => {
+    await ctx.db.delete(args.id);
+  },
+});
