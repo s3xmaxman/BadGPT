@@ -53,7 +53,7 @@ const UpgradeModal = ({ open, setOpen }: UpgradeModalProps) => {
               </div>
               <div className="flex gap-x-4 items-center">
                 <Check className="h-4 w-4" />
-                <p>GPT-3.5 にアクセスする</p>
+                <p>Smallモデルにアクセスする</p>
               </div>
               <div className="flex gap-x-4 items-center">
                 <Check className="h-4 w-4" />
@@ -72,7 +72,7 @@ const UpgradeModal = ({ open, setOpen }: UpgradeModalProps) => {
             >
               Plusにアップグレードする
             </Button>
-            <h4 className="text-sm mb-4">GPT-4をアンロック</h4>
+            <h4 className="text-sm mb-4">Mediumモデルをアンロック</h4>
             <div className="flex flex-col gap-y-3 text-sm">
               <div className="flex gap-x-4 items-center">
                 <Check className="h-4 w-4" />

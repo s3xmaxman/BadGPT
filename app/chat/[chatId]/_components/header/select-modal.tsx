@@ -30,7 +30,8 @@ export const SelectModal = () => {
     return <div>Not logged in</div>;
   }
 
-  const GPTVersionText = currentUser.model === GPTModel.GPT3 ? "3.5" : "4";
+  const GPTVersionText =
+    currentUser.model === GPTModel.GPT3 ? "Small" : "Medium";
 
   const handleClick = (model: GPTModel) => {
     if (model === GPTModel.GPT3) {
@@ -71,7 +72,7 @@ export const SelectModal = () => {
           >
             <Zap className="w-6 h-6" />
             <div className="w-full">
-              <p className="font-normal">GPT3.5</p>
+              <p className="font-normal">BadGPT-Small</p>
               <p className="text-white/70">日常の業務に最適</p>
             </div>
             <Checkbox
@@ -86,7 +87,7 @@ export const SelectModal = () => {
           >
             <Sparkles className="w-6 h-6" />
             <div className="w-full">
-              <p className="font-normal">GPT-4o</p>
+              <p className="font-normal">BadGPT-Medium</p>
               <p className="text-white/70">最もスマートなモデル</p>
               {!isSubscribed && (
                 <div className="w-full p-2 rounded-lg text-white text-xs text-center font-normal cursor-pointer bg-purple-500 active:bg-purple-700 mt-1.5">
