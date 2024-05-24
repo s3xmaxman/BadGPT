@@ -5,6 +5,7 @@ import React from "react";
 import { Markdown } from "./markdown";
 import { Copy, RefreshCcw } from "lucide-react";
 import { useAction } from "convex/react"; // useAction をインポート
+import { toast } from "sonner";
 
 interface MessageBoxProps {
   message: Doc<"messages">;
@@ -36,6 +37,7 @@ const MessageBox = ({
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(message.content);
+    toast("メッセージをコピーしました");
   };
 
   return (
