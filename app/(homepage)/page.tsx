@@ -1,5 +1,6 @@
 "use client";
 
+import { MobileSidebar } from "@/components/mobile-sidebar";
 import { api } from "@/convex/_generated/api";
 import { useMutation, useQueries, useQuery } from "convex/react";
 import { useRouter } from "next/navigation";
@@ -17,7 +18,10 @@ const Homepage = () => {
   // }, [storeUser, router]);
 
   return (
-    <div className="bg-neutral-800 h-full text-neutral-400 text-3xl text-center px-11 pt-11">
+    <div className="bg-neutral-800 min-h-screen text-neutral-400 text-3xl text-center px-11 pt-11 relative">
+      <div className="absolute top-0 left-0">
+        <MobileSidebar />
+      </div>
       Creating a new chat
     </div>
   );

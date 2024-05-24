@@ -1,3 +1,4 @@
+import { MobileSidebar } from "@/components/mobile-sidebar";
 import { Sidebar } from "@/components/sidebar";
 
 interface ChatLayoutProps {
