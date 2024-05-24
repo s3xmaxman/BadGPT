@@ -57,7 +57,7 @@ export const list = query({
       .unique();
 
     if (user === null) {
-      throw new Error("User not found");
+      return null;
     }
 
     return ctx.db
