@@ -3,7 +3,7 @@ import { Doc, Id } from "@/convex/_generated/dataModel";
 import { api } from "@/convex/_generated/api";
 import React from "react";
 import { Markdown } from "./markdown";
-import { RefreshCcw } from "lucide-react";
+import { Copy, RefreshCcw } from "lucide-react";
 import { useAction } from "convex/react"; // useAction をインポート
 
 interface MessageBoxProps {
@@ -34,6 +34,10 @@ const MessageBox = ({
     }
   };
 
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(message.content);
+  };
+
   return (
     <div className="flex space-x-3 items-start mb-10 max-w-[calc(80%)] md:max-w-full text-wrap">
       <Avatar className="w-7 h-7 text-white fill-white">
@@ -48,12 +52,15 @@ const MessageBox = ({
           <Markdown content={message.content} />
         </div>
       </div>
-      {message.role === "assistant" && isLatestMessage && (
-        <RefreshCcw
-          className="w-4 h-4 cursor-pointer"
-          onClick={handleRegenerate}
-        />
-      )}
+      <div className="flex items-center space-x-3">
+        <Copy className="w-4 h-4 cursor-pointer" onClick={copyToClipboard} />
+        {message.role === "assistant" && isLatestMessage && (
+          <RefreshCcw
+            className="w-4 h-4 cursor-pointer"
+            onClick={handleRegenerate}
+          />
+        )}
+      </div>
     </div>
   );
 };
