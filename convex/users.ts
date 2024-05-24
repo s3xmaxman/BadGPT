@@ -80,6 +80,38 @@ export const selectGPT = mutation({
   },
 });
 
+export const upgradeModel = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+
+    if (!identity) {
+      throw new Error("You must be logged in to upgrade your model.");
+    }
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_token", (q) =>
+        q.eq("tokenIdentifier", identity.tokenIdentifier)
+      )
+      .unique();
+
+    if (user === null) {
+      throw new Error("User not found.");
+    }
+
+    // モデルが既にアップグレードされている場合は何もしない
+    if (user.model === "llama3-70b-8192") {
+      return user._id;
+    }
+
+    // モデルをアップグレード
+    await ctx.db.patch(user._id, { model: "llama3-70b-8192" });
+
+    return user._id;
+  },
+});
+
 export const updateSubscription = internalMutation({
   args: {
     subscriptionId: v.string(),

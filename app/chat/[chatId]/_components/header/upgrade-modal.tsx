@@ -7,7 +7,8 @@ import {
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { api } from "@/convex/_generated/api";
-import { useAction } from "convex/react";
+import { upgradeModel } from "@/convex/users";
+import { useAction, useMutation } from "convex/react";
 import { Check } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React from "react";
@@ -18,14 +19,14 @@ interface UpgradeModalProps {
 }
 
 const UpgradeModal = ({ open, setOpen }: UpgradeModalProps) => {
-  const upgrade = useAction(api.stripe.pay);
+  const upgrade = useMutation(api.users.upgradeModel);
   const router = useRouter();
   const handleUpgrade = async () => {
     const url = await upgrade({});
     if (!url) {
       return;
     }
-    router.push(url);
+    router.push("/");
   };
   return (
     <Dialog open={open} onOpenChange={(e) => setOpen(e)}>
