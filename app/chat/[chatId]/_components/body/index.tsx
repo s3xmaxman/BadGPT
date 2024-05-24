@@ -3,7 +3,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { useUser } from "@clerk/clerk-react";
-import { useQuery, useMutation, useAction } from "convex/react";
+import { useQuery } from "convex/react";
 import { useEffect, useRef } from "react";
 import MessageBox from "./message-box";
 
@@ -30,12 +30,13 @@ const Body = ({ chatId }: BodyProps) => {
     <>
       <ScrollArea className="max-h-[calc(100%-150px)] h-full w-full flex-1">
         <div className="px-4 sm:px-12 md:px-52 2xl:px-[430px] relative">
-          {messages?.map((message) => (
+          {messages?.map((message, index) => (
             <MessageBox
               key={message._id}
               message={message}
               userImageUrl={user?.imageUrl}
               chatId={chatId}
+              isLatestMessage={index === messages.length - 1} // 最新メッセージかどうかを判定
             />
           ))}
         </div>

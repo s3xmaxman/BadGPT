@@ -10,9 +10,15 @@ interface MessageBoxProps {
   message: Doc<"messages">;
   userImageUrl?: string;
   chatId: Id<"chats">; // chatId を受け取るように変更
+  isLatestMessage: boolean; // isLatestMessage プロパティを追加
 }
 
-const MessageBox = ({ message, userImageUrl, chatId }: MessageBoxProps) => {
+const MessageBox = ({
+  message,
+  userImageUrl,
+  chatId,
+  isLatestMessage,
+}: MessageBoxProps) => {
   const nameString = message.role === "user" ? "You" : "BadGPT";
   const imageUrl = message.role === "user" ? userImageUrl : "/logo.svg";
 
@@ -42,9 +48,9 @@ const MessageBox = ({ message, userImageUrl, chatId }: MessageBoxProps) => {
           <Markdown content={message.content} />
         </div>
       </div>
-      {message.role === "assistant" && ( // ここを変更
+      {message.role === "assistant" && isLatestMessage && (
         <RefreshCcw
-          className="w-6 h-6 cursor-pointer"
+          className="w-4 h-4 cursor-pointer"
           onClick={handleRegenerate}
         />
       )}

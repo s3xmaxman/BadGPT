@@ -98,7 +98,7 @@ export const submit = action({
     formattedMessages.unshift({
       role: "system",
       content:
-        "Your name is BadGPT and you are a kind and helpful assistant. Please be sure to reply in Japanese!",
+        "あなたの名前はBadGPTで、親切なアシスタントです。必ず日本語で返信してください",
     });
 
     // OpenAI API クライアントを初期化
@@ -212,7 +212,7 @@ export const regenerate = action({
     messagesForRegenerate.unshift({
       role: "system",
       content:
-        "Your name is BadGPT and you are a kind and helpful assistant. Please be sure to reply in Japanese!",
+        "あなたの名前はBadGPTで、親切なアシスタントです。必ず日本語で返信してください",
     });
 
     // OpenAI API クライアントを初期化
