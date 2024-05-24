@@ -97,7 +97,7 @@ export const submit = action({
     formattedMessages.unshift({
       role: "system",
       content:
-        "あなたは親切で役に立つアシスタントです。回答は必ず日本語で返してください。",
+        "貴方の名前はBadAIであなたは親切で役に立つアシスタントです。回答は必ず日本語で返してください。",
     });
 
     // OpenAI API クライアントを初期化
