@@ -1,6 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Doc } from "@/convex/_generated/dataModel";
 import React from "react";
+import { Markdown } from "./markdown";
 
 interface MessageBoxProps {
   message: Doc<"messages">;
@@ -22,7 +23,7 @@ const MessageBox = ({ message, userImageUrl }: MessageBoxProps) => {
       <div className="max-w-[calc(80%)]">
         <h3 className="font-bold">{nameString}</h3>
         <div className="flex flex-grow flex-col gap-3 gap-y-5">
-          {/* <Markdown content={message.content} /> */}
+          <Markdown content={message.content} />
         </div>
       </div>
     </div>
