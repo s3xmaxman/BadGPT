@@ -33,6 +33,7 @@ const UpgradeModal = ({ open, setOpen }: UpgradeModalProps) => {
         <DialogHeader className="p-3">
           <DialogTitle>現在のプランをアップグレードする</DialogTitle>
         </DialogHeader>
+        {/* Free tier */}
         <Separator className="h-[1px] bg-white/20" />
         <div className="flex justify-between">
           <div className="w-1/2 p-4 gap-y-2">
@@ -60,6 +61,7 @@ const UpgradeModal = ({ open, setOpen }: UpgradeModalProps) => {
               </div>
             </div>
           </div>
+          {/* Plus tier */}
           <Separator orientation="vertical" className="w-[1px] bg-white/20" />
           <div className="w-1/2 p-4 gap-y-2">
             <h3 className="text-lg font-semibold">Plus</h3>
