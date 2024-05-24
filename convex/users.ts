@@ -1,5 +1,5 @@
 import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { internalMutation, mutation, query } from "./_generated/server";
 
 export const store = mutation({
   args: {},
@@ -77,5 +77,39 @@ export const selectGPT = mutation({
     await ctx.db.patch(user._id, { model: args.modal });
 
     return user._id;
+  },
+});
+
+export const updateSubscription = internalMutation({
+  args: {
+    subscriptionId: v.string(),
+    userId: v.id("users"),
+    endsOn: v.number(),
+  },
+  handler: async (ctx, { subscriptionId, userId, endsOn }) => {
+    await ctx.db.patch(userId, {
+      subscriptionId: subscriptionId,
+      endsOn: endsOn,
+    });
+  },
+});
+
+export const updateSubscriptionById = internalMutation({
+  args: { subscriptionId: v.string(), endsOn: v.number() },
+  handler: async (ctx, { subscriptionId, endsOn }) => {
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_subscriptionId", (q) =>
+        q.eq("subscriptionId", subscriptionId)
+      )
+      .unique();
+
+    if (!user) {
+      throw new Error("User not found!");
+    }
+
+    await ctx.db.patch(user._id, {
+      endsOn: endsOn,
+    });
   },
 });

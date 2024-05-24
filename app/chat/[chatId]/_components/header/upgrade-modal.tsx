@@ -18,7 +18,7 @@ interface UpgradeModalProps {
 }
 
 const UpgradeModal = ({ open, setOpen }: UpgradeModalProps) => {
-  const upgrade = useAction(api.users.upgrade);
+  const upgrade = useAction(api.stripe.pay);
   const router = useRouter();
   const handleUpgrade = async () => {
     const url = await upgrade({});

@@ -9,7 +9,7 @@ export default defineSchema({
     subscriptionId: v.optional(v.string()),
   })
     .index("by_token", ["tokenIdentifier"])
-    .index("by_subscription", ["subscriptionId"]),
+    .index("by_subscriptionId", ["subscriptionId"]),
   chats: defineTable({
     userId: v.id("users"),
     title: v.string(),
