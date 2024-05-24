@@ -1,6 +1,6 @@
-export type GPTModel = "gpt-3.5-turbo" | "gpt-4o";
+export type GPTModel = "llama3-8b-8192" | "llama3-70b-8192";
 
 export const GPTModel = {
-  GPT3: "gpt-3.5-turbo",
-  GPT4: "gpt-4o",
+  GPT3: "llama3-8b-8192",
+  GPT4: "llama3-70b-8192",
 } as const;

@@ -28,6 +28,8 @@ export const ChatList = () => {
     return null;
   }
 
+  if (!chats) return null;
+
   return (
     <div className="flex flex-col flex-1 overflow-y-auto">
       {chats.map((chat) => (

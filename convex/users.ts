@@ -23,7 +23,7 @@ export const store = mutation({
 
     const userId = await ctx.db.insert("users", {
       tokenIdentifier: identity.tokenIdentifier,
-      model: "gpt-3.5-turbo",
+      model: "llama3-8b-8192",
     });
 
     await ctx.db.insert("chats", {
@@ -53,7 +53,9 @@ export const currentUser = query({
 });
 
 export const selectGPT = mutation({
-  args: { modal: v.union(v.literal("gpt-3.5-turbo"), v.literal("gpt-4o")) },
+  args: {
+    modal: v.union(v.literal("llama3-8b-8192"), v.literal("llama3-70b-8192")),
+  },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
 
