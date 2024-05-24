@@ -91,12 +91,11 @@ export const SelectModal = () => {
             <div className="w-full">
               <p className="font-normal">BadGPT-Medium</p>
               <p className="text-white/70">最もスマートなモデル</p>
-              {!isSubscribed ||
-                (GPTModel.GPT4 && (
-                  <div className="w-full p-2 rounded-lg text-white text-xs text-center font-normal cursor-pointer bg-purple-500 active:bg-purple-700 mt-1.5">
-                    アップグレードする
-                  </div>
-                ))}
+              {currentUser.model !== GPTModel.GPT4 && (
+                <div className="w-full p-2 rounded-lg text-white text-xs text-center font-normal cursor-pointer bg-purple-500 active:bg-purple-700 mt-1.5">
+                  アップグレードする
+                </div>
+              )}
             </div>
             {isSubscribed && (
               <Checkbox

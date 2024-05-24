@@ -1,16 +1,32 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Doc } from "@/convex/_generated/dataModel";
+import { Doc, Id } from "@/convex/_generated/dataModel";
+import { api } from "@/convex/_generated/api";
 import React from "react";
 import { Markdown } from "./markdown";
+import { RefreshCcw } from "lucide-react";
+import { useAction } from "convex/react"; // useAction をインポート
 
 interface MessageBoxProps {
   message: Doc<"messages">;
   userImageUrl?: string;
+  chatId: Id<"chats">; // chatId を受け取るように変更
 }
 
-const MessageBox = ({ message, userImageUrl }: MessageBoxProps) => {
+const MessageBox = ({ message, userImageUrl, chatId }: MessageBoxProps) => {
   const nameString = message.role === "user" ? "You" : "BadGPT";
   const imageUrl = message.role === "user" ? userImageUrl : "/logo.svg";
+
+  // regenerate アクションを使用
+  const regenerate = useAction(api.messages.regenerate);
+
+  // regenerate アクションを実行するハンドラーを定義
+  const handleRegenerate = async () => {
+    try {
+      await regenerate({ chatId });
+    } catch (error) {
+      console.error("Failed to regenerate message:", error);
+    }
+  };
 
   return (
     <div className="flex space-x-3 items-start mb-10 max-w-[calc(80%)] md:max-w-full text-wrap">
@@ -26,6 +42,12 @@ const MessageBox = ({ message, userImageUrl }: MessageBoxProps) => {
           <Markdown content={message.content} />
         </div>
       </div>
+      {message.role === "assistant" && ( // ここを変更
+        <RefreshCcw
+          className="w-6 h-6 cursor-pointer"
+          onClick={handleRegenerate}
+        />
+      )}
     </div>
   );
 };

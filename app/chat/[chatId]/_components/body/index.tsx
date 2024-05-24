@@ -3,8 +3,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { useUser } from "@clerk/clerk-react";
-import { useQuery } from "convex/react";
-import { useEffect, useRef, useState } from "react";
+import { useQuery, useMutation, useAction } from "convex/react";
+import { useEffect, useRef } from "react";
 import MessageBox from "./message-box";
 
 interface BodyProps {
@@ -35,6 +35,7 @@ const Body = ({ chatId }: BodyProps) => {
               key={message._id}
               message={message}
               userImageUrl={user?.imageUrl}
+              chatId={chatId}
             />
           ))}
         </div>
