@@ -66,20 +66,22 @@ export const SelectModal = () => {
           <ChevronDown className="text-white/50 w-5 h-5" />
         </PopoverTrigger>
         <PopoverContent className="flex flex-col border-0 bg-neutral-700 text-white p-3 space-y-4">
-          <div
-            onClick={() => handleClick(GPTModel.GPT3)}
-            className="flex items-center text-start cursor-pointer rounded-md justify-start space-x-2 p-2 w-full h-full hover:bg-neutral-600"
-          >
-            <Zap className="w-6 h-6" />
-            <div className="w-full">
-              <p className="font-normal">BadGPT-Small</p>
-              <p className="text-white/70">日常の業務に最適</p>
+          {currentUser.model !== GPTModel.GPT4 && (
+            <div
+              onClick={() => handleClick(GPTModel.GPT3)}
+              className="flex items-center text-start cursor-pointer rounded-md justify-start space-x-2 p-2 w-full h-full hover:bg-neutral-600"
+            >
+              <Zap className="w-6 h-6" />
+              <div className="w-full">
+                <p className="font-normal">BadGPT-Small</p>
+                <p className="text-white/70">日常の業務に最適</p>
+              </div>
+              <Checkbox
+                id="terms1"
+                checked={currentUser.model === GPTModel.GPT3}
+              />
             </div>
-            <Checkbox
-              id="terms1"
-              checked={currentUser.model === GPTModel.GPT3}
-            />
-          </div>
+          )}
 
           <div
             onClick={() => handleClick(GPTModel.GPT4)}
@@ -89,11 +91,12 @@ export const SelectModal = () => {
             <div className="w-full">
               <p className="font-normal">BadGPT-Medium</p>
               <p className="text-white/70">最もスマートなモデル</p>
-              {!isSubscribed && (
-                <div className="w-full p-2 rounded-lg text-white text-xs text-center font-normal cursor-pointer bg-purple-500 active:bg-purple-700 mt-1.5">
-                  アップグレードする
-                </div>
-              )}
+              {!isSubscribed ||
+                (GPTModel.GPT4 && (
+                  <div className="w-full p-2 rounded-lg text-white text-xs text-center font-normal cursor-pointer bg-purple-500 active:bg-purple-700 mt-1.5">
+                    アップグレードする
+                  </div>
+                ))}
             </div>
             {isSubscribed && (
               <Checkbox

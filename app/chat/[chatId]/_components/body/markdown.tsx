@@ -23,16 +23,12 @@ export const Markdown = ({ content }: Props) => {
           return match ? (
             <div>
               <div className="flex w-full justify-end bg-white/5 p-2 rounded-t-md">
-                <button
-                  onClick={() =>
-                    handleCopy(String(children).replace(/\n$/, ""))
-                  }
-                >
+                <button onClick={() => handleCopy(String(children))}>
                   <Clipboard className="text-white/20 w-4 h-4" />
                 </button>
               </div>
               <SyntaxHighlighter language={match[1]} style={gruvboxDark}>
-                {String(children).replace(/\n$/, "")}
+                {String(children)}
               </SyntaxHighlighter>
             </div>
           ) : (
