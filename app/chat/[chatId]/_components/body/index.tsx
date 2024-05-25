@@ -15,7 +15,6 @@ const Body = ({ chatId }: BodyProps) => {
   const messages = useQuery(api.messages.list, { chatId }) || [];
   const { user } = useUser();
   const scrollRef = useRef<HTMLDivElement>(null);
-
   useEffect(() => {
     scrollBottom();
   }, [messages]);
