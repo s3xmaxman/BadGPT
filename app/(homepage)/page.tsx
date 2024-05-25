@@ -5,6 +5,9 @@ import { api } from "@/convex/_generated/api";
 import { useMutation, useQueries, useQuery } from "convex/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import Form from "../chat/[chatId]/_components/form";
+import { Id } from "@/convex/_generated/dataModel";
+import FormWithCreate from "./_components/FormWithCreate";
 
 const Homepage = () => {
   // const storeUser = useMutation(api.users.store);
@@ -22,7 +25,10 @@ const Homepage = () => {
       <div className="absolute top-0 left-0">
         <MobileSidebar />
       </div>
-      Creating a new chat
+      <h1>新しいチャットを作成</h1>
+      <div className="absolute bottom-0 left-0 w-full">
+        <FormWithCreate />
+      </div>
     </div>
   );
 };
