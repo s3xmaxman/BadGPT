@@ -3,6 +3,7 @@ import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import { NewChatButton } from "../sidebar/new-chat-button";
 import { ChatList } from "../sidebar/chat-list";
 import { UpgradePlanButton } from "../sidebar/upgrade-plan-button";
+import { HomeButton } from "../sidebar/home-button";
 
 export const MobileSidebar = () => {
   return (
@@ -15,6 +16,7 @@ export const MobileSidebar = () => {
           side={"left"}
           className="h-full flex p-4 bg-neutral-950 flex-col"
         >
+          <HomeButton />
           <NewChatButton />
           <ChatList />
           <UpgradePlanButton />
