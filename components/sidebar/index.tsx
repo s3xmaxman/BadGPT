@@ -9,6 +9,7 @@ export const Sidebar = () => {
       <HomeButton />
       <div className="my-2" />
       <NewChatButton />
+      <div className="my-2" />
       <ChatList />
       <UpgradePlanButton />
     </div>
