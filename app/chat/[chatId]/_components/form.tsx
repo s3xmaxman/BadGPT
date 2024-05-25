@@ -1,8 +1,8 @@
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { useAction, useQuery } from "convex/react";
-import { Input } from "@/components/ui/input";
 import React, { useState } from "react";
+import { Textarea } from "@/components/ui/textarea";
 
 interface FormProps {
   chatId: Id<"chats">;
@@ -36,7 +36,7 @@ const Form = ({ chatId }: FormProps) => {
     });
   };
 
-  const handleKeydown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeydown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter") {
       e.preventDefault();
       handleSendMessage();
@@ -45,7 +45,7 @@ const Form = ({ chatId }: FormProps) => {
 
   return (
     <div className="relative px-2 sm:px-12 md:px-52 lg:pr-[500px] 2xl:px-96 w-full bg-neutral-800">
-      <Input
+      <Textarea
         value={message}
         onChange={(e) => setMessage(e.target.value)}
         onKeyDown={handleKeydown}
