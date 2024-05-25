@@ -7,8 +7,7 @@ import {
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { api } from "@/convex/_generated/api";
-import { upgradeModel } from "@/convex/users";
-import { useAction, useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { Check } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React from "react";
@@ -19,6 +18,7 @@ interface UpgradeModalProps {
 }
 
 const UpgradeModal = ({ open, setOpen }: UpgradeModalProps) => {
+  const currentUser = useQuery(api.users.currentUser, {});
   const upgrade = useMutation(api.users.upgradeModel);
   const router = useRouter();
   const handleUpgrade = async () => {
@@ -44,7 +44,9 @@ const UpgradeModal = ({ open, setOpen }: UpgradeModalProps) => {
               disabled
               className="font-semibold text-xs bg-neutral-500 p-4 my-4 text-warp"
             >
-              現在のプラン
+              {currentUser?.model === "llama3-8b-8192"
+                ? "現在のプラン"
+                : "アップグレード済み"}
             </Button>
             <h4 className="text-sm mb-4">初めてのお客様へ</h4>
             <div className="flex flex-col gap-y-3 text-sm">
@@ -69,9 +71,12 @@ const UpgradeModal = ({ open, setOpen }: UpgradeModalProps) => {
             <p className="font-thin text-white/95">$20 ドル/月</p>
             <Button
               onClick={handleUpgrade}
+              disabled={currentUser?.model === "llama3-70b-8192"}
               className="font-semibold text-xs bg-green-600 hover:bg-green-700 p-4 my-4"
             >
-              Plusにアップグレードする
+              {currentUser?.model === "llama3-70b-8192"
+                ? "現在のプラン"
+                : "Plusにアップグレードする"}
             </Button>
             <h4 className="text-sm mb-4">Mediumモデルをアンロック</h4>
             <div className="flex flex-col gap-y-3 text-sm">
