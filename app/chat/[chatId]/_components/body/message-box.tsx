@@ -21,7 +21,7 @@ const MessageBox = ({
   isLatestMessage,
 }: MessageBoxProps) => {
   const nameString = message.role === "user" ? "You" : "BadGPT";
-  const imageUrl = message.role === "user" ? userImageUrl : "/logo.svg";
+  const imageUrl = message.role === "user" ? userImageUrl : "/BadGPT.png";
 
   // regenerate アクションを使用
   const regenerate = useAction(api.messages.regenerate);
