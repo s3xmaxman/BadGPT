@@ -238,7 +238,8 @@ export const regenerate = action({
     }));
 
     // ユーザーの質問を取得
-    const userMessage = messagesForRegenerate.find(
+    const userMessage = messages.find(
+      // 変更点: messages から探す
       (message) => message.role === "user"
     );
 
