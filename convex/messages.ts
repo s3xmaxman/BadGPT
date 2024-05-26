@@ -124,9 +124,9 @@ export const submit = action({
     // OpenAI API に渡す system prompt を設定
     formattedMessages.unshift({
       role: "system",
-      content: `あなたはBadGPTという名前の親切なアシスタントです。必ず日本語で返信してください。
-      ${context ? `これらの情報源を参考にしてください:\n\n${context}\n\n` : ""}
-      回答する際に、参照した情報源がある場合は、引用元を明記してください。
+      content: `You are a kind assistant named BadGPT. Always respond in Japanese.
+      ${context ? `Refer to these sources:\n\n${context}\n\n` : ""}
+      When answering, if there are any sources referenced, please cite them.
       `,
     });
 
