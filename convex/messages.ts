@@ -10,6 +10,8 @@ import {
 import OpenAI from "openai";
 import { WikipediaQueryRun } from "@langchain/community/tools/wikipedia_query_run";
 import { extractKeywords } from "../lib/utils";
+import { exaSearch } from "../lib/utils";
+import { wikipedia } from "../lib/utils";
 
 // 特定のチャットに紐づくメッセージ一覧を取得するクエリ
 export const list = query({
@@ -59,12 +61,6 @@ export const retrieve = internalQuery({
   },
 });
 
-// Wikipedia クエリを実行するためのツール
-const wikipedia = new WikipediaQueryRun({
-  topKResults: 3,
-  maxDocContentLength: 4000,
-});
-
 // ユーザーのメッセージを受け取り、OpenAI APIを呼び出してアシスタントの応答を生成、DBに保存するアクション
 export const submit = action({
   args: {
@@ -75,7 +71,6 @@ export const submit = action({
   handler: async (ctx, args) => {
     // 現在のユーザー情報を取得
     const currentUser = await ctx.runQuery(api.users.currentUser, {});
-
     // ログインしていない場合はエラー
     if (!currentUser) {
       throw new Error("Not logged in");
@@ -102,24 +97,42 @@ export const submit = action({
       content: message.content,
     }));
 
-    // ユーザーの質問からWikipediaで検索するキーワードを抽出
+    // ユーザーの質問から検索するキーワードを抽出
     const keywords = extractKeywords(args.content);
 
-    // Wikipedia から情報を取得
+    // WikipediaとExaSearchから情報を取得
     const wikipediaResults = await Promise.all(
       keywords.map((keyword) => wikipedia.invoke(keyword))
     );
 
-    // Wikipedia から取得した情報それぞれに、キーワードと取得結果を出力
+    const exaSearchResults = await Promise.all(
+      keywords.map(async (keyword) => {
+        const result = await exaSearch(keyword);
+        console.log(`ExaSearch result for keyword "${keyword}":`, result); // ExaSearchの結果をコンソールに出力
+        return result.output;
+      })
+    );
+
+    // 取得した情報それぞれに、キーワードと取得結果を出力
     wikipediaResults.forEach((result, index) => {
-      console.log(`キーワード${index + 1}: ${keywords[index]}`);
-      console.log(`取得結果${index + 1}: ${result}`);
+      console.log(`Wikipediaキーワード${index + 1}: ${keywords[index]}`);
+      console.log(`Wikipedia取得結果${index + 1}: ${result}`);
     });
 
-    // Wikipedia から取得した情報を整形して context としてまとめる
-    const context = wikipediaResults
-      .map((result, index) => `情報源${index + 1}: ${result}`)
-      .join("\n\n");
+    exaSearchResults.forEach((result, index) => {
+      console.log(`ExaSearchキーワード${index + 1}: ${keywords[index]}`);
+      console.log(`ExaSearch取得結果${index + 1}: ${result}`);
+    });
+
+    // 取得した情報を整形して context としてまとめる
+    const context = [
+      ...wikipediaResults.map(
+        (result, index) => `Wikipedia情報源${index + 1}: ${result}`
+      ),
+      ...exaSearchResults.map(
+        (result, index) => `ExaSearch情報源${index + 1}: ${result}`
+      ),
+    ].join("\n\n");
 
     // OpenAI API に渡す system prompt を設定
     formattedMessages.unshift({
@@ -139,7 +152,7 @@ export const submit = action({
     // レスポンスを格納する変数を初期化
     let response = "";
 
-    // OpenAI API を呼び出してアシスタントの応答をストリーミングで取得
+    //OpenAI API を呼び出してアシスタントの応答をストリーミングで取得
     const stream = await openai.chat.completions.create({
       model: currentUser.model,
       stream: true,
