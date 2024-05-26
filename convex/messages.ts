@@ -263,28 +263,46 @@ export const regenerate = action({
     // ユーザーの質問からWikipediaで検索するキーワードを抽出
     const keywords = extractKeywords(userMessage.content);
 
-    // Wikipedia から情報を取得
+    // WikipediaとExaSearchから情報を取得
     const wikipediaResults = await Promise.all(
       keywords.map((keyword) => wikipedia.invoke(keyword))
     );
 
-    // Wikipedia から取得した情報それぞれに、キーワードと取得結果を出力
+    const exaSearchResults = await Promise.all(
+      keywords.map(async (keyword) => {
+        const result = await exaSearch(keyword);
+        console.log(`ExaSearch result for keyword "${keyword}":`, result); // ExaSearchの結果をコンソールに出力
+        return result.output;
+      })
+    );
+
+    // 取得した情報それぞれに、キーワードと取得結果を出力
     wikipediaResults.forEach((result, index) => {
-      console.log(`キーワード${index + 1}: ${keywords[index]}`);
-      console.log(`取得結果${index + 1}: ${result}`);
+      console.log(`Wikipediaキーワード${index + 1}: ${keywords[index]}`);
+      console.log(`Wikipedia取得結果${index + 1}: ${result}`);
     });
 
-    // Wikipedia から取得した情報を整形して context としてまとめる
-    const context = wikipediaResults
-      .map((result, index) => `情報源${index + 1}: ${result}`)
-      .join("\n\n");
+    exaSearchResults.forEach((result, index) => {
+      console.log(`ExaSearchキーワード${index + 1}: ${keywords[index]}`);
+      console.log(`ExaSearch取得結果${index + 1}: ${result}`);
+    });
+
+    // 取得した情報を整形して context としてまとめる
+    const context = [
+      ...wikipediaResults.map(
+        (result, index) => `Wikipedia情報源${index + 1}: ${result}`
+      ),
+      ...exaSearchResults.map(
+        (result, index) => `ExaSearch情報源${index + 1}: ${result}`
+      ),
+    ].join("\n\n");
 
     // OpenAI API に渡す system prompt を設定
     messagesForRegenerate.unshift({
       role: "system",
-      content: `あなたはBadGPTという名前の親切なアシスタントです。必ず日本語で返信してください。
-      ${context ? `これらの情報源を参考にしてください:\n\n${context}\n\n` : ""}
-      回答する際に、参照した情報源がある場合は、引用元を明記してください。
+      content: `You are a kind assistant named BadGPT. Always respond in Japanese.
+      ${context ? `Refer to these sources:\n\n${context}\n\n` : ""}
+      When answering, if there are any sources referenced, please cite them.
       `,
     });
 

@@ -15,7 +15,6 @@ export function cn(...inputs: ClassValue[]) {
 // ユーザーの質問からWikipediaで検索するキーワードを抽出する関数
 export function extractKeywords(question: string): string[] {
   // TODO: ユーザーの質問から適切なキーワードを抽出するロジックを実装する
-  // 例: 形態素解析やキーワード抽出ライブラリを利用する
   return [question]; // とりあえずここでは質問全体をキーワードとして返す
 }
 
@@ -25,6 +24,7 @@ export const wikipedia = new WikipediaQueryRun({
   maxDocContentLength: 4000,
 });
 
+// ExaSearch を実行するためのツール
 export async function exaSearch(keyword: string) {
   const tools = [
     new ExaSearchResults({
@@ -38,15 +38,11 @@ export async function exaSearch(keyword: string) {
 
   const llm = new ChatOpenAI({
     apiKey: process.env.OPENAI_API_KEY,
-    streaming: false,
     model: "llama3-70b-8192",
     configuration: {
       baseURL: "https://api.groq.com/openai/v1",
     },
-    topP: 0.9,
     maxTokens: 8000,
-    frequencyPenalty: 0,
-    presencePenalty: 0,
     temperature: 0.7,
   });
 
@@ -62,6 +58,6 @@ export async function exaSearch(keyword: string) {
   });
 
   const result = await agentExecutor.invoke({ input: keyword });
-  console.log(`ExaSearch result for "${keyword}":`, result); // 取得結果を出力
+  console.log(`ExaSearch result for "${keyword}":`, result);
   return result;
 }
