@@ -8,6 +8,8 @@ import {
   query,
 } from "./_generated/server";
 import OpenAI from "openai";
+import { WikipediaQueryRun } from "@langchain/community/tools/wikipedia_query_run";
+import { extractKeywords } from "../lib/utils";
 
 // 特定のチャットに紐づくメッセージ一覧を取得するクエリ
 export const list = query({
@@ -57,6 +59,12 @@ export const retrieve = internalQuery({
   },
 });
 
+// Wikipedia クエリを実行するためのツール
+const wikipedia = new WikipediaQueryRun({
+  topKResults: 3,
+  maxDocContentLength: 4000,
+});
+
 // ユーザーのメッセージを受け取り、OpenAI APIを呼び出してアシスタントの応答を生成、DBに保存するアクション
 export const submit = action({
   args: {
@@ -94,11 +102,32 @@ export const submit = action({
       content: message.content,
     }));
 
+    // ユーザーの質問からWikipediaで検索するキーワードを抽出
+    const keywords = extractKeywords(args.content);
+
+    // Wikipedia から情報を取得
+    const wikipediaResults = await Promise.all(
+      keywords.map((keyword) => wikipedia.invoke(keyword))
+    );
+
+    // Wikipedia から取得した情報それぞれに、キーワードと取得結果を出力
+    wikipediaResults.forEach((result, index) => {
+      console.log(`キーワード${index + 1}: ${keywords[index]}`);
+      console.log(`取得結果${index + 1}: ${result}`);
+    });
+
+    // Wikipedia から取得した情報を整形して context としてまとめる
+    const context = wikipediaResults
+      .map((result, index) => `情報源${index + 1}: ${result}`)
+      .join("\n\n");
+
     // OpenAI API に渡す system prompt を設定
     formattedMessages.unshift({
       role: "system",
-      content:
-        "あなたの名前はBadGPTで、親切なアシスタントです。必ず日本語で返信してください",
+      content: `あなたはBadGPTという名前の親切なアシスタントです。必ず日本語で返信してください。
+      ${context ? `これらの情報源を参考にしてください:\n\n${context}\n\n` : ""}
+      回答する際に、参照した情報源がある場合は、引用元を明記してください。
+      `,
     });
 
     // OpenAI API クライアントを初期化
@@ -198,6 +227,9 @@ export const regenerate = action({
       messageId: lastMessage._id,
     });
 
+    // メッセージの順番を反転（古いものが先頭に来るように）
+    messages.reverse();
+
     // OpenAI API に渡すメッセージフォーマットに変換
     // (最後のメッセージは含めずに、それ以前のメッセージ履歴を使用)
     const messagesForRegenerate = messages.slice(1).map((message) => ({
@@ -205,14 +237,41 @@ export const regenerate = action({
       content: message.content,
     }));
 
-    // メッセージの順番を反転（古いものが先頭に来るように）
-    messagesForRegenerate.reverse();
+    // ユーザーの質問を取得
+    const userMessage = messagesForRegenerate.find(
+      (message) => message.role === "user"
+    );
+
+    if (!userMessage) {
+      throw new Error("No user message found");
+    }
+
+    // ユーザーの質問からWikipediaで検索するキーワードを抽出
+    const keywords = extractKeywords(userMessage.content);
+
+    // Wikipedia から情報を取得
+    const wikipediaResults = await Promise.all(
+      keywords.map((keyword) => wikipedia.invoke(keyword))
+    );
+
+    // Wikipedia から取得した情報それぞれに、キーワードと取得結果を出力
+    wikipediaResults.forEach((result, index) => {
+      console.log(`キーワード${index + 1}: ${keywords[index]}`);
+      console.log(`取得結果${index + 1}: ${result}`);
+    });
+
+    // Wikipedia から取得した情報を整形して context としてまとめる
+    const context = wikipediaResults
+      .map((result, index) => `情報源${index + 1}: ${result}`)
+      .join("\n\n");
 
     // OpenAI API に渡す system prompt を設定
     messagesForRegenerate.unshift({
       role: "system",
-      content:
-        "あなたの名前はBadGPTで、親切なアシスタントです。必ず日本語で返信してください",
+      content: `あなたはBadGPTという名前の親切なアシスタントです。必ず日本語で返信してください。
+      ${context ? `これらの情報源を参考にしてください:\n\n${context}\n\n` : ""}
+      回答する際に、参照した情報源がある場合は、引用元を明記してください。
+      `,
     });
 
     // OpenAI API クライアントを初期化
