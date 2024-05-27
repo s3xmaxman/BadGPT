@@ -29,7 +29,7 @@ export const wikipedia = new WikipediaQueryRun({
 
 // ExaSearch を実行するためのツール
 export async function exaSearch(keyword: string) {
-  const client = new Exa.default(process.env.EXASEARCH_API_KEY); // ここも修正
+  const client = new Exa.default(process.env.EXASEARCH_API_KEY);
 
   const exaRetriever = new ExaRetriever({
     client,

@@ -1,7 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Doc, Id } from "@/convex/_generated/dataModel";
 import { api } from "@/convex/_generated/api";
-import React from "react";
+import React, { useState } from "react";
 import { Markdown } from "./markdown";
 import { Copy, RefreshCcw } from "lucide-react";
 import { useAction } from "convex/react"; // useAction をインポート
@@ -22,6 +22,7 @@ const MessageBox = ({
 }: MessageBoxProps) => {
   const nameString = message.role === "user" ? "You" : "BadGPT";
   const imageUrl = message.role === "user" ? userImageUrl : "/BadGPT.png";
+  const [isLoading, setIsLoading] = useState(false);
 
   // regenerate アクションを使用
   const regenerate = useAction(api.messages.regenerate);
@@ -29,9 +30,12 @@ const MessageBox = ({
   // regenerate アクションを実行するハンドラーを定義
   const handleRegenerate = async () => {
     try {
+      setIsLoading(true);
       await regenerate({ chatId });
     } catch (error) {
       console.error("Failed to regenerate message:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -56,7 +60,7 @@ const MessageBox = ({
       </div>
       <div className="flex items-center space-x-3">
         <Copy className="w-4 h-4 cursor-pointer" onClick={copyToClipboard} />
-        {message.role === "assistant" && isLatestMessage && (
+        {message.role === "assistant" && isLatestMessage && !isLoading && (
           <RefreshCcw
             className="w-4 h-4 cursor-pointer"
             onClick={handleRegenerate}
