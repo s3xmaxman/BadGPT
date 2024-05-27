@@ -1,5 +1,4 @@
 import { WikipediaQueryRun } from "@langchain/community/tools/wikipedia_query_run";
-import { DuckDuckGoSearch } from "@langchain/community/tools/duckduckgo_search";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { ChatOpenAI } from "@langchain/openai";
@@ -80,6 +79,7 @@ export async function exaSearch(keyword: string) {
   return result;
 }
 
+// DuckDuckGoSearch を実行するためのツール
 export const duckGoSearch = async (query: string): Promise<SearchResult[]> => {
   try {
     const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
