@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
 
   let match;
   let count = 0;
-  while ((match = regex.exec(html)) !== null && count < 7) {
+  while ((match = regex.exec(html)) !== null && count < 3) {
     let link = match[1];
 
     if (link.startsWith("//duckduckgo.com/l/?uddg=")) {

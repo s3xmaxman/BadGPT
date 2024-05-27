@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { useAction, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 import { Textarea } from "@/components/ui/textarea";
+import { duckGoSearch } from "@/lib/utils";
 
 const FormWithCreate = () => {
   const createChat = useMutation(api.chats.create);
@@ -19,10 +19,20 @@ const FormWithCreate = () => {
 
     try {
       const newChatId = await createChat();
+      const results = await duckGoSearch(message);
+
+      // 検索結果をフォーマット
+      const formattedResults = results
+        .map(
+          (result) =>
+            `タイトル: ${result.title}\nリンク: ${result.link}\nスニペット: ${result.snippet}\n\n`
+        )
+        .join("");
       await sendMessage({
         role: "user",
         content: message,
         chatId: newChatId,
+        duckGo: formattedResults,
       });
       router.push(`/chat/${newChatId}`);
       setMessage("");

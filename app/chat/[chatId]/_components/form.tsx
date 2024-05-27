@@ -3,6 +3,7 @@ import { Id } from "@/convex/_generated/dataModel";
 import { useAction, useQuery } from "convex/react";
 import React, { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
+import { duckGoSearch } from "@/lib/utils";
 
 interface FormProps {
   chatId: Id<"chats">;
@@ -31,12 +32,29 @@ const Form = ({ chatId }: FormProps) => {
     setIsLoading(true);
 
     try {
-      const temp = message;
+      // 検索クエリを取得
+      const query = message;
+
+      // メッセージを一時的にクリア
       setMessage("");
+
+      // DuckDuckGo APIを呼び出して検索結果を取得
+      const results = await duckGoSearch(query);
+
+      // 検索結果をフォーマット
+      const formattedResults = results
+        .map(
+          (result) =>
+            `タイトル: ${result.title}\nリンク: ${result.link}\nスニペット: ${result.snippet}\n\n`
+        )
+        .join("");
+
+      // メッセージとして送信
       await sendMessage({
         role: "user",
-        content: temp,
+        content: query,
         chatId: chat._id,
+        duckGo: formattedResults,
       });
     } catch (error) {
       console.error("Error sending message:", error);

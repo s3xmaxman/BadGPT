@@ -22,5 +22,6 @@ export default defineSchema({
     ),
     content: v.string(),
     chatId: v.id("chats"),
+    duckGo: v.optional(v.string()),
   }).index("by_chatId", ["chatId"]),
 });

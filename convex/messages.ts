@@ -30,6 +30,7 @@ export const send = internalMutation({
     role: v.union(v.literal("user"), v.literal("assistant")), // メッセージの送信者(user or assistant)
     content: v.string(), // メッセージの内容
     chatId: v.id("chats"), // メッセージが紐づくチャットID
+    duckGo: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     // DBのmessagesコレクションに新しいメッセージを挿入
@@ -37,6 +38,7 @@ export const send = internalMutation({
       role: args.role,
       content: args.content,
       chatId: args.chatId,
+      duckGo: args.duckGo,
     });
 
     // 新しく挿入されたメッセージのIDを返す
@@ -66,6 +68,7 @@ export const submit = action({
     role: v.union(v.literal("user"), v.literal("assistant")), // メッセージの送信者(user or assistant)
     content: v.string(), // メッセージの内容
     chatId: v.id("chats"), // メッセージが紐づくチャットID
+    duckGo: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     // 現在のユーザー情報を取得
@@ -80,6 +83,7 @@ export const submit = action({
       role: args.role,
       content: args.content,
       chatId: args.chatId,
+      duckGo: args.duckGo,
     });
 
     // 直近のチャットメッセージを取得
@@ -104,12 +108,12 @@ export const submit = action({
       keywords.map((keyword) => wikipedia.invoke(keyword))
     );
 
-    const exaSearchResults = await Promise.all(
-      keywords.map(async (keyword) => {
-        const result = await exaSearch(keyword);
-        return result.output;
-      })
-    );
+    // const exaSearchResults = await Promise.all(
+    //   keywords.map(async (keyword) => {
+    //     const result = await exaSearch(keyword);
+    //     return result.output;
+    //   })
+    // );
 
     // 取得した情報それぞれに、キーワードと取得結果を出力
     wikipediaResults.forEach((result, index) => {
@@ -117,20 +121,20 @@ export const submit = action({
       console.log(`Wikipedia取得結果${index + 1}: ${result}`);
     });
 
-    exaSearchResults.forEach((result, index) => {
-      console.log(`ExaSearchキーワード${index + 1}: ${keywords[index]}`);
-      console.log(`ExaSearch取得結果${index + 1}: ${result}`);
-    });
+    // exaSearchResults.forEach((result, index) => {
+    //   console.log(`ExaSearchキーワード${index + 1}: ${keywords[index]}`);
+    //   console.log(`ExaSearch取得結果${index + 1}: ${result}`);
+    // });
 
-    // 取得した情報を整形して context としてまとめる
     const contextParts = [
       ...wikipediaResults.map(
         (result, index) => `Wikipedia:${index + 1}: ${result}`
       ),
-      ...exaSearchResults.map(
-        (result, index) => `ExaSearch:${index + 1}: ${result}`
-      ),
     ];
+
+    if (args.duckGo) {
+      contextParts.push(`DuckDuckGo: ${args.duckGo}`);
+    }
 
     // 情報源が存在しない場合のメッセージを追加
     if (contextParts.length === 0) {
@@ -145,8 +149,9 @@ export const submit = action({
     formattedMessages.unshift({
       role: "system",
       content: `You are a kind assistant named BadGPT. Always respond in Japanese.
-      Refer to these sources:\n\n${context}\n\n
+      Refer to these sources(wiki):\n\n${context}\n\n 
       When answering, if there are any sources referenced, please cite them.
+
       `,
     });
 
@@ -337,7 +342,7 @@ export const regenerate = action({
       model: currentUser.model,
       stream: true,
       messages: messagesForRegenerate, // system prompt を含むメッセージ履歴を渡す
-      temperature: 1,
+      temperature: 0.3,
       max_tokens: 8000,
       top_p: 1,
       frequency_penalty: 0,
