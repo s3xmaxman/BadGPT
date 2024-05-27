@@ -108,7 +108,6 @@ export const submit = action({
     const exaSearchResults = await Promise.all(
       keywords.map(async (keyword) => {
         const result = await exaSearch(keyword);
-        console.log(`ExaSearch result for keyword "${keyword}":`, result); // ExaSearchの結果をコンソールに出力
         return result.output;
       })
     );
@@ -125,20 +124,29 @@ export const submit = action({
     });
 
     // 取得した情報を整形して context としてまとめる
-    const context = [
+    const contextParts = [
       ...wikipediaResults.map(
-        (result, index) => `Wikipedia情報源${index + 1}: ${result}`
+        (result, index) => `Wikipedia:${index + 1}: ${result}`
       ),
       ...exaSearchResults.map(
-        (result, index) => `ExaSearch情報源${index + 1}: ${result}`
+        (result, index) => `ExaSearch:${index + 1}: ${result}`
       ),
-    ].join("\n\n");
+    ];
+
+    // 情報源が存在しない場合のメッセージを追加
+    if (contextParts.length === 0) {
+      contextParts.push(
+        "情報源が見つかりませんでしたが、以下の応答をご参考ください。"
+      );
+    }
+
+    const context = contextParts.join("\n\n");
 
     // OpenAI API に渡す system prompt を設定
     formattedMessages.unshift({
       role: "system",
       content: `You are a kind assistant named BadGPT. Always respond in Japanese.
-      ${context ? `Refer to these sources:\n\n${context}\n\n` : ""}
+      Refer to these sources:\n\n${context}\n\n
       When answering, if there are any sources referenced, please cite them.
       `,
     });
@@ -152,12 +160,12 @@ export const submit = action({
     // レスポンスを格納する変数を初期化
     let response = "";
 
-    //OpenAI API を呼び出してアシスタントの応答をストリーミングで取得
+    // OpenAI API を呼び出してアシスタントの応答をストリーミングで取得
     const stream = await openai.chat.completions.create({
       model: currentUser.model,
       stream: true,
       messages: formattedMessages, // system prompt を含むメッセージ履歴を渡す
-      temperature: 1,
+      temperature: 0.7,
       max_tokens: 8000,
       top_p: 1,
       frequency_penalty: 0,
@@ -288,20 +296,30 @@ export const regenerate = action({
     });
 
     // 取得した情報を整形して context としてまとめる
-    const context = [
+    const contextParts = [
       ...wikipediaResults.map(
-        (result, index) => `Wikipedia情報源${index + 1}: ${result}`
+        (result, index) => `Wikipedia:${index + 1}: ${result}`
       ),
       ...exaSearchResults.map(
-        (result, index) => `ExaSearch情報源${index + 1}: ${result}`
+        (result, index) => `ExaSearch:${index + 1}: ${result}`
       ),
-    ].join("\n\n");
+    ];
+
+    // 情報源が存在しない場合のメッセージを追加
+    if (contextParts.length === 0) {
+      contextParts.push(
+        "情報源が見つかりませんでしたが、以下の応答をご参考ください。"
+      );
+    }
+
+    // context を結合
+    const context = contextParts.join("\n\n");
 
     // OpenAI API に渡す system prompt を設定
     messagesForRegenerate.unshift({
       role: "system",
       content: `You are a kind assistant named BadGPT. Always respond in Japanese.
-      ${context ? `Refer to these sources:\n\n${context}\n\n` : ""}
+      Refer to these sources:\n\n${context}\n\n
       When answering, if there are any sources referenced, please cite them.
       `,
     });
