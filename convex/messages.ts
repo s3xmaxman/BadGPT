@@ -8,7 +8,6 @@ import {
   query,
 } from "./_generated/server";
 import OpenAI from "openai";
-import { WikipediaQueryRun } from "@langchain/community/tools/wikipedia_query_run";
 import { extractKeywords } from "../lib/utils";
 import { exaSearch } from "../lib/utils";
 import { wikipedia } from "../lib/utils";

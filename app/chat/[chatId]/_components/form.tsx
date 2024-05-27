@@ -13,6 +13,7 @@ const Form = ({ chatId }: FormProps) => {
   const sendMessage = useAction(api.messages.submit);
 
   const [message, setMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   if (chat === null) {
     return null;
@@ -23,17 +24,25 @@ const Form = ({ chatId }: FormProps) => {
   }
 
   const handleSendMessage = async () => {
-    if (message === "") {
+    if (message === "" || isLoading) {
       return;
     }
 
-    const temp = message;
-    setMessage("");
-    await sendMessage({
-      role: "user",
-      content: temp,
-      chatId: chat._id,
-    });
+    setIsLoading(true);
+
+    try {
+      const temp = message;
+      setMessage("");
+      await sendMessage({
+        role: "user",
+        content: temp,
+        chatId: chat._id,
+      });
+    } catch (error) {
+      console.error("Error sending message:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleKeydown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -49,9 +58,15 @@ const Form = ({ chatId }: FormProps) => {
         value={message}
         onChange={(e) => setMessage(e.target.value)}
         onKeyDown={handleKeydown}
+        disabled={isLoading}
         className="border-[1px] border-neutral-500 ring-none rounded-xl bg-inherit text-neutral-200 placeholder:text-neutral-400 h-12"
         placeholder="BadGPTにメッセージを送信する"
       />
+      {isLoading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-neutral-800 bg-opacity-50">
+          <span className="text-neutral-400">送信中...</span>
+        </div>
+      )}
     </div>
   );
 };

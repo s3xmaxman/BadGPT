@@ -10,9 +10,12 @@ const FormWithCreate = () => {
   const sendMessage = useAction(api.messages.submit);
   const router = useRouter();
   const [message, setMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSendMessage = async () => {
-    if (message === "") return;
+    if (message === "" || isLoading) return;
+
+    setIsLoading(true);
 
     try {
       const newChatId = await createChat();
@@ -22,8 +25,11 @@ const FormWithCreate = () => {
         chatId: newChatId,
       });
       router.push(`/chat/${newChatId}`);
+      setMessage("");
     } catch (error) {
       console.error("Error creating chat or sending message:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -40,9 +46,15 @@ const FormWithCreate = () => {
         value={message}
         onChange={(e) => setMessage(e.target.value)}
         onKeyDown={handleKeydown}
+        disabled={isLoading}
         className="border-[1px] border-neutral-500 ring-none rounded-xl bg-inherit text-neutral-200 placeholder:text-neutral-400 h-12"
         placeholder="BadGPTにメッセージを送信する"
       />
+      {isLoading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-neutral-800 bg-opacity-50">
+          <span className="text-neutral-400">送信中...</span>
+        </div>
+      )}
     </div>
   );
 };
