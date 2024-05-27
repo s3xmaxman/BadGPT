@@ -1,12 +1,15 @@
 import { WikipediaQueryRun } from "@langchain/community/tools/wikipedia_query_run";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { ExaSearchResults } from "@langchain/exa";
 import { ChatOpenAI } from "@langchain/openai";
-import type { ChatPromptTemplate } from "@langchain/core/prompts";
-import Exa from "exa-js";
-import { pull } from "langchain/hub";
+import {
+  ChatPromptTemplate,
+  MessagesPlaceholder,
+} from "@langchain/core/prompts";
+import * as Exa from "exa-js"; // ここを修正しました
 import { AgentExecutor, createOpenAIFunctionsAgent } from "langchain/agents";
+import { createRetrieverTool } from "langchain/tools/retriever";
+import { ExaRetriever } from "@langchain/exa";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -26,15 +29,21 @@ export const wikipedia = new WikipediaQueryRun({
 
 // ExaSearch を実行するためのツール
 export async function exaSearch(keyword: string) {
-  const tools = [
-    new ExaSearchResults({
-      client: new Exa(process.env.EXASEARCH_API_KEY),
-    }),
-  ];
+  const client = new Exa.default(process.env.EXASEARCH_API_KEY); // ここも修正
 
-  const prompt = await pull<ChatPromptTemplate>(
-    "hwchase17/openai-functions-agent"
-  );
+  const exaRetriever = new ExaRetriever({
+    client,
+    searchArgs: {
+      numResults: 2,
+    },
+  });
+
+  const searchTool = createRetrieverTool(exaRetriever, {
+    name: "search",
+    description: "Get the contents of a webpage given a string search query.",
+  });
+
+  const tools = [searchTool];
 
   const llm = new ChatOpenAI({
     apiKey: process.env.OPENAI_API_KEY,
@@ -43,17 +52,24 @@ export async function exaSearch(keyword: string) {
       baseURL: "https://api.groq.com/openai/v1",
     },
     maxTokens: 8000,
-    temperature: 0.7,
+    temperature: 0,
   });
 
-  const agent = await createOpenAIFunctionsAgent({
-    llm,
-    tools,
-    prompt,
-  });
+  const prompt = ChatPromptTemplate.fromMessages([
+    [
+      "system",
+      `You are a web researcher who answers user questions by looking up information on the internet and retrieving contents of helpful documents. Cite your sources.`,
+    ],
+    ["human", "{input}"],
+    new MessagesPlaceholder("agent_scratchpad"),
+  ]);
 
   const agentExecutor = new AgentExecutor({
-    agent,
+    agent: await createOpenAIFunctionsAgent({
+      llm,
+      tools,
+      prompt,
+    }),
     tools,
   });
 
