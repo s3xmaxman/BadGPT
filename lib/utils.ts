@@ -1,4 +1,5 @@
 import { WikipediaQueryRun } from "@langchain/community/tools/wikipedia_query_run";
+import { DuckDuckGoSearch } from "@langchain/community/tools/duckduckgo_search";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { ChatOpenAI } from "@langchain/openai";
@@ -77,3 +78,31 @@ export async function exaSearch(keyword: string) {
   console.log(`ExaSearch result for "${keyword}":`, result);
   return result;
 }
+
+type SearchResult = {
+  title: string;
+  link: string;
+  snippet: string;
+};
+
+export const duckGoSearch = async (query: string): Promise<SearchResult[]> => {
+  try {
+    const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log("API response:", data);
+
+    if (!Array.isArray(data.results)) {
+      throw new Error("API response is not an array");
+    }
+
+    return data.results;
+  } catch (error: any) {
+    console.error("Failed to fetch search results:", error);
+    throw error;
+  }
+};
