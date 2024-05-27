@@ -37,9 +37,9 @@ export default function Home() {
         {results.map((result, index) => (
           <li key={index}>
             <a href={result.link} target="_blank" rel="noopener noreferrer">
-              {result.title}
+              title:{result.title}
             </a>
-            <p>{result.snippet}</p>
+            <p>snippet:{result.snippet}</p>
           </li>
         ))}
       </ul>

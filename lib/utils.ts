@@ -11,6 +11,7 @@ import * as Exa from "exa-js"; // ここを修正しました
 import { AgentExecutor, createOpenAIFunctionsAgent } from "langchain/agents";
 import { createRetrieverTool } from "langchain/tools/retriever";
 import { ExaRetriever } from "@langchain/exa";
+import { SearchResult } from "./types";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -78,12 +79,6 @@ export async function exaSearch(keyword: string) {
   console.log(`ExaSearch result for "${keyword}":`, result);
   return result;
 }
-
-type SearchResult = {
-  title: string;
-  link: string;
-  snippet: string;
-};
 
 export const duckGoSearch = async (query: string): Promise<SearchResult[]> => {
   try {

@@ -1,13 +1,8 @@
 "use server";
+import { SearchResult } from "@/lib/types";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import fetch from "node-fetch";
-
-type SearchResult = {
-  title: string;
-  link: string;
-  snippet: string;
-};
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
