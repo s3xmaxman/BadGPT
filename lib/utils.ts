@@ -25,7 +25,7 @@ export function extractKeywords(question: string): string[] {
 // Wikipedia クエリを実行するためのツール
 export const wikipedia = new WikipediaQueryRun({
   topKResults: 3,
-  maxDocContentLength: 4000,
+  maxDocContentLength: 3000,
 });
 
 // ExaSearch を実行するためのツール

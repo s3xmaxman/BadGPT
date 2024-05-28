@@ -83,14 +83,12 @@ export const submit = action({
     const keywords = extractKeywords(args.content);
 
     // WikipediaとExaSearchから情報を取得
-    // 既に await Promise.all() を使用している場合は、この対応は不要です。
     const wikipediaResults = await Promise.all(
       keywords.map(async (keyword) => await wikipedia.invoke(keyword))
     );
 
+    // Wikipediaの検索結果を結合
     const formattedWikipediaResults = wikipediaResults.join("\n\n");
-
-    console.log("Wikipedia Results:", wikipediaResults);
 
     // ユーザーのメッセージをDBに保存
     await ctx.runMutation(internal.messages.send, {
