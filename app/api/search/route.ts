@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
 
   let match;
   let count = 0;
-  while ((match = regex.exec(html)) !== null && count < 3) {
+  while ((match = regex.exec(html)) !== null && count < 5) {
     let link = match[1];
 
     if (link.startsWith("//duckduckgo.com/l/?uddg=")) {
@@ -40,6 +40,6 @@ export async function GET(request: NextRequest) {
     count++;
   }
 
-  console.log("API response:", results);
+  // 検索結果を返す
   return NextResponse.json({ results });
 }

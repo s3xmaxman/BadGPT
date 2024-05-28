@@ -8,9 +8,7 @@ import {
   query,
 } from "./_generated/server";
 import OpenAI from "openai";
-import { extractKeywords } from "../lib/utils";
-import { exaSearch } from "../lib/utils";
-import { wikipedia } from "../lib/utils";
+import { exaSearch, extractKeywords, wikipedia } from "../lib/utils";
 
 // 特定のチャットに紐づくメッセージ一覧を取得するクエリ
 export const list = query({
@@ -31,6 +29,7 @@ export const send = internalMutation({
     content: v.string(), // メッセージの内容
     chatId: v.id("chats"), // メッセージが紐づくチャットID
     duckGo: v.optional(v.string()),
+    wiki: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     // DBのmessagesコレクションに新しいメッセージを挿入
@@ -39,6 +38,7 @@ export const send = internalMutation({
       content: args.content,
       chatId: args.chatId,
       duckGo: args.duckGo,
+      wiki: args.wiki,
     });
 
     // 新しく挿入されたメッセージのIDを返す
@@ -62,21 +62,35 @@ export const retrieve = internalQuery({
   },
 });
 
-// ユーザーのメッセージを受け取り、OpenAI APIを呼び出してアシスタントの応答を生成、DBに保存するアクション
 export const submit = action({
   args: {
-    role: v.union(v.literal("user"), v.literal("assistant")), // メッセージの送信者(user or assistant)
-    content: v.string(), // メッセージの内容
-    chatId: v.id("chats"), // メッセージが紐づくチャットID
+    role: v.union(v.literal("user"), v.literal("assistant")),
+    content: v.string(),
+    chatId: v.id("chats"),
     duckGo: v.optional(v.string()),
+    wiki: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     // 現在のユーザー情報を取得
     const currentUser = await ctx.runQuery(api.users.currentUser, {});
+
     // ログインしていない場合はエラー
     if (!currentUser) {
       throw new Error("Not logged in");
     }
+
+    // ユーザーの質問から検索するキーワードを抽出
+    const keywords = extractKeywords(args.content);
+
+    // WikipediaとExaSearchから情報を取得
+    // 既に await Promise.all() を使用している場合は、この対応は不要です。
+    const wikipediaResults = await Promise.all(
+      keywords.map(async (keyword) => await wikipedia.invoke(keyword))
+    );
+
+    const formattedWikipediaResults = wikipediaResults.join("\n\n");
+
+    console.log("Wikipedia Results:", wikipediaResults);
 
     // ユーザーのメッセージをDBに保存
     await ctx.runMutation(internal.messages.send, {
@@ -84,6 +98,7 @@ export const submit = action({
       content: args.content,
       chatId: args.chatId,
       duckGo: args.duckGo,
+      wiki: formattedWikipediaResults,
     });
 
     // 直近のチャットメッセージを取得
@@ -99,32 +114,6 @@ export const submit = action({
       role: message.role,
       content: message.content,
     }));
-
-    // ユーザーの質問から検索するキーワードを抽出
-    const keywords = extractKeywords(args.content);
-
-    // WikipediaとExaSearchから情報を取得
-    const wikipediaResults = await Promise.all(
-      keywords.map((keyword) => wikipedia.invoke(keyword))
-    );
-
-    // const exaSearchResults = await Promise.all(
-    //   keywords.map(async (keyword) => {
-    //     const result = await exaSearch(keyword);
-    //     return result.output;
-    //   })
-    // );
-
-    // 取得した情報それぞれに、キーワードと取得結果を出力
-    wikipediaResults.forEach((result, index) => {
-      console.log(`Wikipediaキーワード${index + 1}: ${keywords[index]}`);
-      console.log(`Wikipedia取得結果${index + 1}: ${result}`);
-    });
-
-    // exaSearchResults.forEach((result, index) => {
-    //   console.log(`ExaSearchキーワード${index + 1}: ${keywords[index]}`);
-    //   console.log(`ExaSearch取得結果${index + 1}: ${result}`);
-    // });
 
     const contextParts = [
       ...wikipediaResults.map(
@@ -151,7 +140,6 @@ export const submit = action({
       content: `You are a kind assistant named BadGPT. Always respond in Japanese.
       Refer to these sources(wiki):\n\n${context}\n\n 
       When answering, if there are any sources referenced, please cite them.
-
       `,
     });
 
@@ -168,8 +156,8 @@ export const submit = action({
     const stream = await openai.chat.completions.create({
       model: currentUser.model,
       stream: true,
-      messages: formattedMessages, // system prompt を含むメッセージ履歴を渡す
-      temperature: 0.7,
+      messages: formattedMessages,
+      temperature: 0.3,
       max_tokens: 8000,
       top_p: 1,
       frequency_penalty: 0,
@@ -208,7 +196,10 @@ export const submit = action({
 
 // メッセージの内容を更新する内部mutation
 export const update = internalMutation({
-  args: { messageId: v.id("messages"), content: v.string() }, // メッセージIDと更新する内容を引数として受け取る
+  args: {
+    messageId: v.id("messages"),
+    content: v.string(),
+  }, // メッセージIDと更新する内容を引数として受け取る
   handler: async (ctx, args) => {
     // 指定されたメッセージIDのメッセージの内容を更新
     await ctx.db.patch(args.messageId, {
@@ -280,32 +271,10 @@ export const regenerate = action({
       keywords.map((keyword) => wikipedia.invoke(keyword))
     );
 
-    const exaSearchResults = await Promise.all(
-      keywords.map(async (keyword) => {
-        const result = await exaSearch(keyword);
-        console.log(`ExaSearch result for keyword "${keyword}":`, result); // ExaSearchの結果をコンソールに出力
-        return result.output;
-      })
-    );
-
-    // 取得した情報それぞれに、キーワードと取得結果を出力
-    wikipediaResults.forEach((result, index) => {
-      console.log(`Wikipediaキーワード${index + 1}: ${keywords[index]}`);
-      console.log(`Wikipedia取得結果${index + 1}: ${result}`);
-    });
-
-    exaSearchResults.forEach((result, index) => {
-      console.log(`ExaSearchキーワード${index + 1}: ${keywords[index]}`);
-      console.log(`ExaSearch取得結果${index + 1}: ${result}`);
-    });
-
     // 取得した情報を整形して context としてまとめる
     const contextParts = [
       ...wikipediaResults.map(
         (result, index) => `Wikipedia:${index + 1}: ${result}`
-      ),
-      ...exaSearchResults.map(
-        (result, index) => `ExaSearch:${index + 1}: ${result}`
       ),
     ];
 
@@ -342,7 +311,7 @@ export const regenerate = action({
       model: currentUser.model,
       stream: true,
       messages: messagesForRegenerate, // system prompt を含むメッセージ履歴を渡す
-      temperature: 0.3,
+      temperature: 0.7,
       max_tokens: 8000,
       top_p: 1,
       frequency_penalty: 0,
