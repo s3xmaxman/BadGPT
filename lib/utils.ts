@@ -80,7 +80,7 @@ export async function exaSearch(keyword: string) {
 }
 
 // DuckDuckGoSearch を実行するためのツール
-export const duckGoSearch = async (query: string): Promise<SearchResult[]> => {
+export const duckGoSearch = async (query: string) => {
   try {
     const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
 
@@ -101,3 +101,18 @@ export const duckGoSearch = async (query: string): Promise<SearchResult[]> => {
     throw error;
   }
 };
+
+export function formattedResultsToJson(
+  formattedResults: string
+): SearchResult[] {
+  const results: SearchResult[] = [];
+  const regex = /タイトル: (.*)\nリンク: (.*)\nスニペット: (.*)\n\n/g;
+  let match;
+
+  while ((match = regex.exec(formattedResults)) !== null) {
+    const [, title, link, snippet] = match;
+    results.push({ title, link, snippet });
+  }
+
+  return results;
+}

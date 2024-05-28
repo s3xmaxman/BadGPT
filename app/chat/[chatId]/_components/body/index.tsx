@@ -4,8 +4,9 @@ import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { useUser } from "@clerk/clerk-react";
 import { useQuery } from "convex/react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import MessageBox from "./message-box";
+import DuckGoResults from "./duckGo";
 
 interface BodyProps {
   chatId: Id<"chats">;
@@ -15,6 +16,7 @@ const Body = ({ chatId }: BodyProps) => {
   const messages = useQuery(api.messages.list, { chatId }) || [];
   const { user } = useUser();
   const scrollRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     scrollBottom();
   }, [messages]);
@@ -35,7 +37,8 @@ const Body = ({ chatId }: BodyProps) => {
               message={message}
               userImageUrl={user?.imageUrl}
               chatId={chatId}
-              isLatestMessage={index === messages.length - 1} // 最新メッセージかどうかを判定
+              duckGo={message.duckGo}
+              isLatestMessage={index === messages.length - 1}
             />
           ))}
         </div>

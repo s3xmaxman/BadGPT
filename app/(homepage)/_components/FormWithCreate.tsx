@@ -4,6 +4,7 @@ import { api } from "@/convex/_generated/api";
 import { useRouter } from "next/navigation";
 import { Textarea } from "@/components/ui/textarea";
 import { duckGoSearch } from "@/lib/utils";
+import { SearchResult } from "@/lib/types";
 
 const FormWithCreate = () => {
   const createChat = useMutation(api.chats.create);
@@ -24,7 +25,7 @@ const FormWithCreate = () => {
       // 検索結果をフォーマット
       const formattedResults = results
         .map(
-          (result) =>
+          (result: SearchResult) =>
             `タイトル: ${result.title}\nリンク: ${result.link}\nスニペット: ${result.snippet}\n\n`
         )
         .join("");

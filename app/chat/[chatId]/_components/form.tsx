@@ -4,6 +4,7 @@ import { useAction, useQuery } from "convex/react";
 import React, { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { duckGoSearch } from "@/lib/utils";
+import { SearchResult } from "@/lib/types";
 
 interface FormProps {
   chatId: Id<"chats">;
@@ -44,7 +45,7 @@ const Form = ({ chatId }: FormProps) => {
       // 検索結果をフォーマット
       const formattedResults = results
         .map(
-          (result) =>
+          (result: SearchResult) =>
             `タイトル: ${result.title}\nリンク: ${result.link}\nスニペット: ${result.snippet}\n\n`
         )
         .join("");

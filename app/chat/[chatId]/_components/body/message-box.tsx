@@ -1,17 +1,19 @@
+import React, { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Doc, Id } from "@/convex/_generated/dataModel";
 import { api } from "@/convex/_generated/api";
-import React, { useState } from "react";
 import { Markdown } from "./markdown";
 import { Copy, RefreshCcw } from "lucide-react";
-import { useAction } from "convex/react"; // useAction をインポート
+import { useAction } from "convex/react";
 import { toast } from "sonner";
+import DuckGoResults from "./duckGo";
 
 interface MessageBoxProps {
   message: Doc<"messages">;
   userImageUrl?: string;
-  chatId: Id<"chats">; // chatId を受け取るように変更
-  isLatestMessage: boolean; // isLatestMessage プロパティを追加
+  chatId: Id<"chats">;
+  isLatestMessage: boolean;
+  duckGo: string | undefined;
 }
 
 const MessageBox = ({
@@ -19,15 +21,14 @@ const MessageBox = ({
   userImageUrl,
   chatId,
   isLatestMessage,
+  duckGo,
 }: MessageBoxProps) => {
   const nameString = message.role === "user" ? "You" : "BadGPT";
   const imageUrl = message.role === "user" ? userImageUrl : "/BadGPT.png";
   const [isLoading, setIsLoading] = useState(false);
 
-  // regenerate アクションを使用
   const regenerate = useAction(api.messages.regenerate);
 
-  // regenerate アクションを実行するハンドラーを定義
   const handleRegenerate = async () => {
     try {
       setIsLoading(true);
@@ -56,6 +57,7 @@ const MessageBox = ({
         <h3 className="font-bold">{nameString}</h3>
         <div className="flex flex-grow flex-col gap-3 gap-y-5">
           <Markdown content={message.content} />
+          <DuckGoResults duckGoData={message.duckGo} />
         </div>
       </div>
       <div className="flex items-center space-x-3">
