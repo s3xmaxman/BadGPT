@@ -29,13 +29,16 @@ const FormWithCreate = () => {
             `タイトル: ${result.title}\nリンク: ${result.link}\nスニペット: ${result.snippet}\n\n`
         )
         .join("");
+
+      router.push(`/chat/${newChatId}`);
+
       await sendMessage({
         role: "user",
         content: message,
         chatId: newChatId,
         duckGo: formattedResults,
       });
-      router.push(`/chat/${newChatId}`);
+
       setMessage("");
     } catch (error) {
       console.error("Error creating chat or sending message:", error);
