@@ -61,10 +61,13 @@ const MessageBox = ({
         </div>
       </div>
       <div className="flex items-center space-x-3">
-        <Copy className="w-4 h-4 cursor-pointer" onClick={copyToClipboard} />
+        <Copy
+          className="w-4 h-4 cursor-pointer transition duration-300 ease-in-out hover:-translate-y-1"
+          onClick={copyToClipboard}
+        />
         {message.role === "assistant" && isLatestMessage && !isLoading && (
           <RefreshCcw
-            className="w-4 h-4 cursor-pointer"
+            className="w-4 h-4 cursor-pointer transition duration-300 ease-in-out hover:-translate-y-1"
             onClick={handleRegenerate}
           />
         )}

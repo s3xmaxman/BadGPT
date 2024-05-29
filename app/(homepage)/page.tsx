@@ -7,6 +7,7 @@ import { useEffect } from "react";
 import Form from "../chat/[chatId]/_components/form";
 import { Id } from "@/convex/_generated/dataModel";
 import FormWithCreate from "./_components/FormWithCreate";
+import { UserButton } from "@clerk/clerk-react";
 
 const Homepage = () => {
   // const storeUser = useMutation(api.users.store);
@@ -21,6 +22,9 @@ const Homepage = () => {
 
   return (
     <div className="bg-neutral-800 min-h-screen text-neutral-400 text-3xl text-center px-11 pt-11 relative">
+      <div className="absolute top-0 right-8 mt-6">
+        <UserButton />
+      </div>
       <div className="absolute top-0 left-0">
         <MobileSidebar />
       </div>

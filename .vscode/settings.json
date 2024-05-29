@@ -1,3 +1,4 @@
 {
-  "CodeGPT.apiKey": "Groq"
+  "CodeGPT.apiKey": "Groq",
+  "CodeGPT.query.language": "Japanese"
 }
