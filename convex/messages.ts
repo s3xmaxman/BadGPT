@@ -8,7 +8,7 @@ import {
   query,
 } from "./_generated/server";
 import OpenAI from "openai";
-import { exaSearch, extractKeywords, wikipedia } from "../lib/utils";
+import { extractKeywords, wikipedia } from "../lib/utils";
 
 // 特定のチャットに紐づくメッセージ一覧を取得するクエリ
 export const list = query({
@@ -136,8 +136,7 @@ export const submit = action({
     formattedMessages.unshift({
       role: "system",
       content: `You are a kind assistant named BadGPT. Always respond in Japanese.
-      Refer to these sources(wiki):\n\n${context}\n\n 
-      When answering, if there are any sources referenced, please cite them.
+      Refer to these sources:\n\n${context}\n\n 
       `,
     });
 
@@ -291,7 +290,6 @@ export const regenerate = action({
       role: "system",
       content: `You are a kind assistant named BadGPT. Always respond in Japanese.
       Refer to these sources:\n\n${context}\n\n
-      When answering, if there are any sources referenced, please cite them.
       `,
     });
 

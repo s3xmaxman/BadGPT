@@ -6,11 +6,10 @@ import {
   ChatPromptTemplate,
   MessagesPlaceholder,
 } from "@langchain/core/prompts";
-import * as Exa from "exa-js"; // ここを修正しました
+import * as Exa from "exa-js";
 import { AgentExecutor, createOpenAIFunctionsAgent } from "langchain/agents";
 import { createRetrieverTool } from "langchain/tools/retriever";
 import { ExaRetriever } from "@langchain/exa";
-import { SearchResult } from "./types";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -101,18 +100,3 @@ export const duckGoSearch = async (query: string) => {
     throw error;
   }
 };
-
-export function formattedResultsToJson(
-  formattedResults: string
-): SearchResult[] {
-  const results: SearchResult[] = [];
-  const regex = /タイトル: (.*)\nリンク: (.*)\nスニペット: (.*)\n\n/g;
-  let match;
-
-  while ((match = regex.exec(formattedResults)) !== null) {
-    const [, title, link, snippet] = match;
-    results.push({ title, link, snippet });
-  }
-
-  return results;
-}
