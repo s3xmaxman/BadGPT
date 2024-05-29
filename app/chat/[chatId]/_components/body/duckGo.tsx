@@ -34,7 +34,7 @@ const DuckGoResults: React.FC<DuckGoResultsProps> = ({ duckGoData }) => {
     <div>
       {parsedResults.length > 0 && (
         <div className="mt-4">
-          <h4 className="font-semibold">Web検索結果:</h4>
+          <h4 className="font-bold mb-2">Web検索結果:</h4>
           <ul className="list-disc list-inside">
             {parsedResults.map((result: SearchResult, index: number) => (
               <li key={index}>
@@ -42,10 +42,11 @@ const DuckGoResults: React.FC<DuckGoResultsProps> = ({ duckGoData }) => {
                   href={result.link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-purple-400 hover:underline"
+                  className="text-green-400 hover:underline font-semibold"
                 >
                   {result.title}
                 </a>
+                <hr className="my-2" />
                 <p className="text-sm text-white">{result.snippet}</p>
               </li>
             ))}
