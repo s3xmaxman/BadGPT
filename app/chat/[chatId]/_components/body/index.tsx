@@ -36,7 +36,6 @@ const Body = ({ chatId }: BodyProps) => {
               message={message}
               userImageUrl={user?.imageUrl}
               chatId={chatId}
-              duckGo={message.duckGo}
               isLatestMessage={index === messages.length - 1}
             />
           ))}

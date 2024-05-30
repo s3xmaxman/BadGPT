@@ -13,7 +13,6 @@ interface MessageBoxProps {
   userImageUrl?: string;
   chatId: Id<"chats">;
   isLatestMessage: boolean;
-  duckGo: string | undefined;
 }
 
 const MessageBox = ({
@@ -21,7 +20,6 @@ const MessageBox = ({
   userImageUrl,
   chatId,
   isLatestMessage,
-  duckGo,
 }: MessageBoxProps) => {
   const nameString = message.role === "user" ? "You" : "BadGPT";
   const imageUrl = message.role === "user" ? userImageUrl : "/BadGPT.png";
