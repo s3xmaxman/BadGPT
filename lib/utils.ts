@@ -30,7 +30,6 @@ export const duckGoSearch = async (query: string) => {
     }
 
     const data = await response.json();
-    console.log("API response:", data);
 
     if (!Array.isArray(data.results)) {
       throw new Error("API response is not an array");

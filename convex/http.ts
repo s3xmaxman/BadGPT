@@ -13,14 +13,11 @@ http.route({
       signature,
       payload: await request.text(),
     });
+
     if (result.success) {
-      return new Response(null, {
-        status: 200,
-      });
+      return new Response(null, { status: 200 });
     } else {
-      return new Response("Webhook Error", {
-        status: 400,
-      });
+      return new Response("Webhook Error", { status: 400 });
     }
   }),
 });
