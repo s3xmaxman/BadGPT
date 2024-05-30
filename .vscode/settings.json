@@ -1,4 +1,4 @@
 {
-  "CodeGPT.apiKey": "Cohere",
+  "CodeGPT.apiKey": "Groq",
   "CodeGPT.query.language": "Japanese"
 }

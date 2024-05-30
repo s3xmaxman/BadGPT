@@ -23,7 +23,7 @@ export const UpgradePlanButton = () => {
         <>
           <UpgradeModal open={openUpgradeModal} setOpen={setOpenUpgradeModal} />
           <Button
-            className="bg-tranparent gap-x-2 justify-start p-2 h-fit hover:bg-neutral-800"
+            className="bg-transparent gap-x-2 justify-start p-2 h-fit hover:bg-neutral-800"
             onClick={handleClick}
           >
             <Sparkles className="rounded-full bg-transparent border-[1px] border-neutral-600  p-1 fill-white" />
