@@ -1,9 +1,9 @@
 "use server";
 import { SearchResult } from "@/lib/types";
+import { fetchAndScrapeSnippet } from "@/lib/utils";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import fetch from "node-fetch";
-import * as cheerio from "cheerio";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -52,25 +52,4 @@ export async function GET(request: NextRequest) {
   const fetchedResults = await Promise.all(promises);
 
   return NextResponse.json({ results: fetchedResults });
-}
-
-// URL からコンテンツを取得し、スニペットを生成する関数
-async function fetchAndScrapeSnippet(url: string): Promise<string | null> {
-  try {
-    const response = await fetch(url, { timeout: 5000 }); // タイムアウト設定
-    const html = await response.text();
-    const $ = cheerio.load(html);
-
-    let snippet = $('meta[name="description"]').attr("content");
-
-    if (!snippet) {
-      const importantText = $("h1, h2, p").text().replace(/\s+/g, " ").trim();
-      snippet = importantText.substring(0, 200) + "...";
-    }
-
-    return snippet;
-  } catch (error) {
-    console.error(`Error fetching or scraping ${url}:`, error);
-    return null;
-  }
 }
