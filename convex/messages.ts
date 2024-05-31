@@ -4,7 +4,6 @@ import {
   action,
   internalMutation,
   internalQuery,
-  mutation,
   query,
 } from "./_generated/server";
 import OpenAI from "openai";
