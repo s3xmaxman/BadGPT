@@ -28,7 +28,9 @@ const Homepage = () => {
       <div className="absolute top-0 left-0">
         <MobileSidebar />
       </div>
-      <h1>新しいチャットを作成</h1>
+      <h1>
+        <span className="hidden md:inline">新しいチャットを作成</span>
+      </h1>
       <div className="absolute bottom-0 left-0 w-full">
         <FormWithCreate />
       </div>
